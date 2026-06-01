@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from routers import crawler, health, news
+from routers import crawler, gapgpt, health, news
 
 app = FastAPI(
     title="Faratech News Backend",
@@ -11,6 +11,7 @@ app = FastAPI(
 app.include_router(health.router)
 app.include_router(news.router)
 app.include_router(crawler.router)
+app.include_router(gapgpt.router)
 
 
 if __name__ == "__main__":
