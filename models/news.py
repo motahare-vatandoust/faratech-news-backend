@@ -1,8 +1,15 @@
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class NewsStatus(str, Enum):
+    draft = "draft"
+    review = "review"
+    published = "published"
 
 
 class NewsBase(BaseModel):
@@ -14,16 +21,26 @@ class NewsBase(BaseModel):
 
 
 class NewsCreate(NewsBase):
-    pass
+    status: NewsStatus = Field(default=NewsStatus.draft)
 
 
 class NewsUpdate(NewsBase):
-    pass
+    status: Optional[NewsStatus] = None
+
+
+class NewsPatch(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    summary: Optional[str] = None
+    source: Optional[str] = None
+    source_url: Optional[str] = None
+    status: Optional[NewsStatus] = None
 
 
 class NewsResponse(NewsBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    status: NewsStatus
     created_at: datetime
     updated_at: datetime

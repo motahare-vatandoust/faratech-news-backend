@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from crawler.registry import get_crawler
 from crawler.schemas import CrawlResult, CrawledArticle
 from db.models.news import News
-from models.news import NewsCreate
+from models.news import NewsCreate, NewsStatus
 from services import news as news_service
 from services.article_translator import translate_article_to_farsi
 
@@ -19,25 +19,36 @@ def _article_to_news_create(article: CrawledArticle, source: str) -> NewsCreate:
         summary=article.summary,
         source=source,
         source_url=str(article.source_url),
+        status=NewsStatus.draft,
     )
 
 
-async def _article_to_farsi_news_create(
-    article: CrawledArticle, source: str
-) -> NewsCreate:
+async def _translate_crawled_article(article: CrawledArticle) -> CrawledArticle:
     translated = await asyncio.to_thread(
         translate_article_to_farsi,
         title=article.title,
         content=article.content,
         summary=article.summary,
     )
-    return NewsCreate(
-        title=translated.title,
-        content=translated.content,
-        summary=translated.summary,
-        source=source,
-        source_url=str(article.source_url),
+    return article.model_copy(
+        update={
+            "title": translated.title,
+            "content": translated.content,
+            "summary": translated.summary,
+        }
     )
+
+
+async def _apply_farsi_translation(result: CrawlResult) -> None:
+    translated_articles: list[CrawledArticle] = []
+    for article in result.articles:
+        source_url = str(article.source_url)
+        try:
+            translated_articles.append(await _translate_crawled_article(article))
+        except Exception as exc:
+            result.errors.append(f"{source_url}: translation failed: {exc}")
+            translated_articles.append(article)
+    result.articles = translated_articles
 
 
 def _find_existing(db: Session, source: str, source_url: str) -> Optional[News]:
@@ -56,6 +67,9 @@ async def run_crawl(
     crawler = get_crawler(source)
     result = await crawler.crawl(limit=limit)
 
+    if translate_to_farsi:
+        await _apply_farsi_translation(result)
+
     if not persist:
         return result, 0
 
@@ -67,10 +81,7 @@ async def run_crawl(
             continue
 
         try:
-            if translate_to_farsi:
-                news_data = await _article_to_farsi_news_create(article, source)
-            else:
-                news_data = _article_to_news_create(article, source)
+            news_data = _article_to_news_create(article, source)
             news_service.create_news(db, news_data)
             saved_count += 1
         except Exception as exc:

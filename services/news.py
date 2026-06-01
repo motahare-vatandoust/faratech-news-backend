@@ -4,12 +4,18 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from db.models.news import News
-from models.news import NewsCreate, NewsUpdate
+from db.models.news import News, NewsStatus
+from models.news import NewsCreate, NewsPatch, NewsUpdate
 
 
-def get_all_news(db: Session) -> List[News]:
+def get_all_news(
+    db: Session,
+    *,
+    status: Optional[NewsStatus] = None,
+) -> List[News]:
     stmt = select(News).order_by(News.created_at.desc())
+    if status is not None:
+        stmt = stmt.where(News.status == status)
     return list(db.scalars(stmt).all())
 
 
@@ -30,7 +36,21 @@ def update_news(db: Session, news_id: UUID, data: NewsUpdate) -> Optional[News]:
     if news is None:
         return None
 
-    for field, value in data.model_dump().items():
+    payload = data.model_dump(exclude_unset=True)
+    for field, value in payload.items():
+        setattr(news, field, value)
+
+    db.commit()
+    db.refresh(news)
+    return news
+
+
+def patch_news(db: Session, news_id: UUID, data: NewsPatch) -> Optional[News]:
+    news = db.get(News, news_id)
+    if news is None:
+        return None
+
+    for field, value in data.model_dump(exclude_unset=True).items():
         setattr(news, field, value)
 
     db.commit()
