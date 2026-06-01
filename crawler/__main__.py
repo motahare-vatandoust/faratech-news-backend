@@ -45,7 +45,7 @@ async def _main() -> None:
 
         db = SessionLocal()
         try:
-            translate = args.source == "dzone" and not args.no_translate
+            translate = not args.no_translate
             result, saved_count = await crawler_service.run_crawl(
                 db,
                 args.source,
@@ -70,7 +70,7 @@ async def _main() -> None:
             print(
                 "\nAll crawled articles are already in the news table. "
                 "Try a higher --limit, or delete existing rows to re-import:\n"
-                "  DELETE FROM news WHERE source = 'dzone';"
+                f"  DELETE FROM news WHERE source = '{result.source}';"
             )
         if result.skipped_urls:
             print("\nSkipped URLs:")

@@ -93,3 +93,19 @@ async def sync_dzone(
         persist=True,
         translate_to_farsi=translate_to_farsi,
     )
+
+
+async def sync_deepmind(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new Google DeepMind blog articles, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "deepmind",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
