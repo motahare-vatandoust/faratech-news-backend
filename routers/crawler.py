@@ -45,6 +45,7 @@ async def run_crawler(
         request.source,
         limit=request.limit,
         persist=request.persist,
+        translate_to_farsi=request.translate_to_farsi,
     )
 
     return CrawlResponse(
@@ -61,9 +62,15 @@ async def run_crawler(
 async def sync_dzone_news(
     db: Session = Depends(get_db),
     limit: Optional[int] = Query(default=None, ge=1, le=100),
+    translate_to_farsi: bool = Query(
+        default=True,
+        description="Translate and clean articles to Farsi via GapGPT before saving",
+    ),
 ) -> CrawlResponse:
-    """Crawl DZone for new articles and save them to the news table."""
-    result, saved_count = await crawler_service.sync_dzone(db, limit=limit)
+    """Crawl DZone, translate to Farsi, and save new articles to the news table."""
+    result, saved_count = await crawler_service.sync_dzone(
+        db, limit=limit, translate_to_farsi=translate_to_farsi
+    )
 
     return CrawlResponse(
         source=result.source,

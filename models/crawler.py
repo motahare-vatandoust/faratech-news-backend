@@ -18,6 +18,10 @@ class CrawlRequest(BaseModel):
         default=True,
         description="When true, save new articles to the database",
     )
+    translate_to_farsi: bool = Field(
+        default=True,
+        description="When true, translate and clean content via GapGPT before saving",
+    )
 
 
 class CrawlResponse(BaseModel):

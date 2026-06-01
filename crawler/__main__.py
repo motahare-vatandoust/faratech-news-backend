@@ -32,6 +32,11 @@ async def _main() -> None:
         action="store_true",
         help="Save new articles to the news table (requires DATABASE_URL)",
     )
+    parser.add_argument(
+        "--no-translate",
+        action="store_true",
+        help="Save crawled English text without GapGPT Farsi translation",
+    )
     args = parser.parse_args()
 
     if args.save:
@@ -40,16 +45,39 @@ async def _main() -> None:
 
         db = SessionLocal()
         try:
+            translate = args.source == "dzone" and not args.no_translate
             result, saved_count = await crawler_service.run_crawl(
-                db, args.source, limit=args.limit, persist=True
+                db,
+                args.source,
+                limit=args.limit,
+                persist=True,
+                translate_to_farsi=translate,
             )
         finally:
             db.close()
 
+        fetched = len(result.articles)
+        skipped = len(result.skipped_urls)
+        mode = "Farsi (GapGPT)" if translate else "English (no translation)"
+
         print(f"Source: {result.source}")
-        print(f"Saved: {saved_count}, skipped: {len(result.skipped_urls)}")
+        print(f"Fetched from site: {fetched}")
+        print(f"Saved to database: {saved_count}")
+        print(f"Skipped (already exist): {skipped}")
+        print(f"Translation: {mode}")
+
+        if saved_count == 0 and skipped > 0 and not result.errors:
+            print(
+                "\nAll crawled articles are already in the news table. "
+                "Try a higher --limit, or delete existing rows to re-import:\n"
+                "  DELETE FROM news WHERE source = 'dzone';"
+            )
+        if result.skipped_urls:
+            print("\nSkipped URLs:")
+            for url in result.skipped_urls:
+                print(f"  - {url}")
         if result.errors:
-            print("Errors:")
+            print("\nErrors:")
             for error in result.errors:
                 print(f"  - {error}")
         return
