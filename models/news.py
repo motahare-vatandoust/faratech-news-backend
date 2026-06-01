@@ -9,6 +9,7 @@ class NewsBase(BaseModel):
     title: str
     content: str
     summary: Optional[str] = None
+    source: Optional[str] = None
     source_url: Optional[str] = None
 
 

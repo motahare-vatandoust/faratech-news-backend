@@ -1,0 +1,20 @@
+from typing import Dict, Type
+
+from crawler.base import BaseCrawler
+from crawler.sources.dzone.crawler import DZoneCrawler
+
+_CRAWLERS: Dict[str, Type[BaseCrawler]] = {
+    DZoneCrawler.source_name: DZoneCrawler,
+}
+
+
+def get_crawler(source: str) -> BaseCrawler:
+    crawler_cls = _CRAWLERS.get(source)
+    if crawler_cls is None:
+        known = ", ".join(sorted(_CRAWLERS))
+        raise ValueError(f"Unknown crawler source '{source}'. Known sources: {known}")
+    return crawler_cls()
+
+
+def list_sources() -> list[str]:
+    return sorted(_CRAWLERS.keys())
