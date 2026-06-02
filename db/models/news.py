@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, Enum, String, Text, func
+from sqlalchemy import JSON, DateTime, Enum, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -25,6 +25,8 @@ class News(Base):
     title: Mapped[str] = mapped_column(String(512), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    category: Mapped[Optional[str]] = mapped_column(String(128), nullable=True, index=True)
+    tags: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True)
     source: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
     source_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
     status: Mapped[NewsStatus] = mapped_column(

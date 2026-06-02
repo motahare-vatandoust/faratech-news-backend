@@ -16,6 +16,8 @@ class NewsBase(BaseModel):
     title: str
     content: str
     summary: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[list[str]] = None
     source: Optional[str] = None
     source_url: Optional[str] = None
 
@@ -32,6 +34,8 @@ class NewsPatch(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
     summary: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[list[str]] = None
     source: Optional[str] = None
     source_url: Optional[str] = None
     status: Optional[NewsStatus] = None
