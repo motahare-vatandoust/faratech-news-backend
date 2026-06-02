@@ -120,3 +120,35 @@ async def sync_deepmind(
         persist=True,
         translate_to_farsi=translate_to_farsi,
     )
+
+
+async def sync_hubspot(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new HubSpot blog articles, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "hubspot",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+
+async def sync_marketingweek(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new Marketing Week posts, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "marketingweek",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
