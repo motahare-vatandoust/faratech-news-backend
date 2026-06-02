@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import crawler, gapgpt, health, news
+from routers import admin_auth, crawler, gapgpt, health, news
 
 app = FastAPI(
     title="Faratech News Backend",
@@ -25,6 +25,7 @@ app.include_router(health.router)
 app.include_router(news.router)
 app.include_router(crawler.router)
 app.include_router(gapgpt.router)
+app.include_router(admin_auth.router)
 
 
 if __name__ == "__main__":
