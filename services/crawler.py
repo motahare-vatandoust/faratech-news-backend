@@ -154,6 +154,22 @@ async def sync_marketingweek(
     )
 
 
+async def sync_rundown(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new Rundown AI posts, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "rundown",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+
 async def sync_bensbites(
     db: Session,
     *,

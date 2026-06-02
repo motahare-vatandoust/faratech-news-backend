@@ -151,6 +151,30 @@ async def sync_marketingweek_news(
     )
 
 
+@router.post("/rundown/sync", response_model=CrawlResponse)
+async def sync_rundown_news(
+    db: Session = Depends(get_db),
+    limit: Optional[int] = Query(default=None, ge=1, le=100),
+    translate_to_farsi: bool = Query(
+        default=True,
+        description="Translate and clean articles to Farsi via GapGPT before saving",
+    ),
+) -> CrawlResponse:
+    """Crawl The Rundown AI, translate to Farsi, and save new articles."""
+    result, saved_count = await crawler_service.sync_rundown(
+        db, limit=limit, translate_to_farsi=translate_to_farsi
+    )
+
+    return CrawlResponse(
+        source=result.source,
+        fetched_count=len(result.articles),
+        saved_count=saved_count,
+        skipped_count=len(result.skipped_urls),
+        errors=result.errors,
+        articles=result.articles,
+    )
+
+
 @router.post("/bensbites/sync", response_model=CrawlResponse)
 async def sync_bensbites_news(
     db: Session = Depends(get_db),

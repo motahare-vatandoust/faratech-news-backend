@@ -6,12 +6,14 @@ from crawler.sources.deepmind.crawler import DeepMindCrawler
 from crawler.sources.dzone.crawler import DZoneCrawler
 from crawler.sources.hubspot.crawler import HubSpotCrawler
 from crawler.sources.marketingweek.crawler import MarketingWeekCrawler
+from crawler.sources.rundown.crawler import RundownCrawler
 
 _CRAWLERS: Dict[str, Type[BaseCrawler]] = {
     DZoneCrawler.source_name: DZoneCrawler,
     DeepMindCrawler.source_name: DeepMindCrawler,
     HubSpotCrawler.source_name: HubSpotCrawler,
     MarketingWeekCrawler.source_name: MarketingWeekCrawler,
+    RundownCrawler.source_name: RundownCrawler,
     BensBitesCrawler.source_name: BensBitesCrawler,
 }
 
