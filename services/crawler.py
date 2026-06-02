@@ -152,3 +152,19 @@ async def sync_marketingweek(
         persist=True,
         translate_to_farsi=translate_to_farsi,
     )
+
+
+async def sync_bensbites(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new Ben's Bites posts, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "bensbites",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )

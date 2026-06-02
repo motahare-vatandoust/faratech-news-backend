@@ -1,6 +1,7 @@
 from typing import Dict, Type
 
 from crawler.base import BaseCrawler
+from crawler.sources.bensbites.crawler import BensBitesCrawler
 from crawler.sources.deepmind.crawler import DeepMindCrawler
 from crawler.sources.dzone.crawler import DZoneCrawler
 from crawler.sources.hubspot.crawler import HubSpotCrawler
@@ -11,6 +12,7 @@ _CRAWLERS: Dict[str, Type[BaseCrawler]] = {
     DeepMindCrawler.source_name: DeepMindCrawler,
     HubSpotCrawler.source_name: HubSpotCrawler,
     MarketingWeekCrawler.source_name: MarketingWeekCrawler,
+    BensBitesCrawler.source_name: BensBitesCrawler,
 }
 
 
