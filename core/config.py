@@ -17,3 +17,6 @@ GAPGPT_TRANSLATION_MODEL = os.getenv("GAPGPT_TRANSLATION_MODEL", GAPGPT_DEFAULT_
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "change-this-in-production")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
+
+_cors_raw = os.getenv("CORS_ORIGINS", "")
+CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()]
