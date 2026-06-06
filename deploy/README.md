@@ -1,90 +1,124 @@
-# Deploy to Arvan Cloud + Pars Pack DNS
+# Deploy & update (Arvan VPS + Pars Pack CDN)
 
-Server IP example: `95.38.160.122`  
-API hostname: `api.faratech.news`
+Server: `ubuntu@95.38.160.122`  
+App path: `/opt/faratech-news-backend`  
+API: `https://api.faratech.news`
 
-## 1. DNS (Pars Pack)
+Iranian VPS cannot reach GitHub/PyPI reliably — **always rsync from Mac** and **install Python deps offline**.
 
-In [my.parspack.com](https://my.parspack.com/) → domain **faratech.news** → DNS:
+---
 
-| Type | Name | Value        | TTL  |
-|------|------|--------------|------|
-| A    | api  | 95.38.160.122 | 300 |
+## First-time setup (once)
 
-Optional (frontend on same VPS later):
-
-| Type | Name | Value        |
-|------|------|--------------|
-| A    | @    | 95.38.160.122 |
-| A    | www  | 95.38.160.122 |
-
-Wait until `dig api.faratech.news +short` returns `95.38.160.122`.
-
-## 2. Arvan Cloud firewall
-
-In [panel.arvancloud.ir](https://panel.arvancloud.ir/) → your VPS → firewall/security:
-
-- Allow **22** (SSH), **80**, **443**
-
-## 3. Server setup (Iran / Arvan VPS)
-
-If `apt` or `git clone` hang or show **Temporary failure resolving**, fix mirrors and DNS first:
+### Mac — download Linux wheels
 
 ```bash
-cd /opt/faratech-news-backend
-sudo bash deploy/fix-apt-iran.sh
-sudo apt-get install -y postgresql postgresql-contrib nginx python3-venv python3-pip certbot python3-certbot-nginx
+cd /Users/mac/Developer/faratech-news-backend
+bash deploy/download-wheels-linux.sh
 ```
 
-Upload code with `rsync` from your Mac if GitHub is unreachable on the server.
-
-SSH in:
+### Mac — upload code + wheels
 
 ```bash
-ssh root@95.38.160.122
+rsync -avz --exclude '.venv' --exclude 'venv' --exclude '__pycache__' --exclude '.git' --exclude '.env' \
+  ./ ubuntu@95.38.160.122:/opt/faratech-news-backend/
+
+rsync -avz wheels-linux/ ubuntu@95.38.160.122:/opt/faratech-news-backend/wheels-linux/
 ```
 
-Clone and configure:
+### Server — Postgres, .env, install
 
 ```bash
-export DB_PASSWORD='choose-a-strong-db-password'
-git clone <your-repo-url> /opt/faratech-news-backend
+ssh ubuntu@95.38.160.122
 cd /opt/faratech-news-backend
-sudo -E bash deploy/setup-server.sh
 
 cp .env.example .env
-# Edit .env: DATABASE_URL, GAPGPT_API_KEY, JWT_SECRET_KEY, CORS_ORIGINS
-nano .env
+nano .env   # DATABASE_URL uses user faratech, not postgres
 
-sudo chown -R www-data:www-data /opt/faratech-news-backend
-
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/alembic upgrade head
-
-sudo cp deploy/faratech-api.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now faratech-api
-
-sudo cp deploy/nginx-api.conf /etc/nginx/sites-available/faratech-api
-sudo ln -sf /etc/nginx/sites-available/faratech-api /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-
-sudo certbot --nginx -d api.faratech.news
+bash deploy/install-offline.sh
 ```
 
-## 4. Verify
+`.env` minimum:
+
+```env
+DATABASE_URL=postgresql+psycopg://faratech:PASSWORD@localhost:5432/faratech_news
+GAPGPT_API_KEY=...
+JWT_SECRET_KEY=...
+CORS_ORIGINS=https://faratech.news,https://www.faratech.news
+```
+
+### Pars Pack CDN
+
+- Nameservers: `mountain.parspack.net`, `savanna.parspack.net`
+- A record: `api` → `95.38.160.122`
+- Origin: `95.38.160.122:80` (HTTP)
+- SSL: enable in CDN panel
+
+### Verify
 
 ```bash
+# server
+curl http://127.0.0.1:8000/health
+curl -H "Host: api.faratech.news" http://127.0.0.1/health
+
+# Mac
 curl https://api.faratech.news/health
 ```
 
-## 5. Updates
+---
+
+## Every code update (normal workflow)
+
+### 1. Mac — upload changes
 
 ```bash
+cd /Users/mac/Developer/faratech-news-backend
+
+rsync -avz --exclude '.venv' --exclude 'venv' --exclude '__pycache__' --exclude '.git' --exclude '.env' \
+  ./ ubuntu@95.38.160.122:/opt/faratech-news-backend/
+```
+
+If `requirements.txt` changed, also on Mac:
+
+```bash
+bash deploy/download-wheels-linux.sh
+rsync -avz wheels-linux/ ubuntu@95.38.160.122:/opt/faratech-news-backend/wheels-linux/
+```
+
+### 2. Server — install + migrate + restart
+
+```bash
+ssh ubuntu@95.38.160.122
 cd /opt/faratech-news-backend
-git pull
-.venv/bin/pip install -r requirements.txt
+
+# deps changed:
+.venv/bin/pip install --no-index --find-links=./wheels-linux -r requirements.txt
+
+# always after code changes:
 .venv/bin/alembic upgrade head
+sudo chown -R www-data:www-data /opt/faratech-news-backend
 sudo systemctl restart faratech-api
 ```
+
+Or full reinstall (recreates venv):
+
+```bash
+bash deploy/install-offline.sh
+```
+
+### 3. Verify
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+---
+
+## Troubleshooting
+
+| Problem | Command |
+|---------|---------|
+| API down | `sudo journalctl -u faratech-api -n 30 --no-pager` |
+| DB auth fail | `grep DATABASE_URL .env` — user must be `faratech` |
+| 502 from CDN | `sudo systemctl status nginx`; CDN origin `95.38.160.122:80` |
+| apt slow/broken | `sudo bash deploy/fix-apt-iran.sh` |
