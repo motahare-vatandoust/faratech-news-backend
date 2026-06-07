@@ -19,10 +19,15 @@ bash deploy/download-wheels-linux.sh
 
 ### Mac — upload code + wheels
 
+`/opt/faratech-news-backend` is owned by `www-data` — use `deploy/sync.sh` or chown first:
+
 ```bash
+bash deploy/sync.sh   # normal code updates (migrate + restart)
+
+# first-time upload (includes wheels):
+ssh ubuntu@95.38.160.122 'sudo chown -R ubuntu:ubuntu /opt/faratech-news-backend'
 rsync -avz --exclude '.venv' --exclude 'venv' --exclude '__pycache__' --exclude '.git' --exclude '.env' \
   ./ ubuntu@95.38.160.122:/opt/faratech-news-backend/
-
 rsync -avz wheels-linux/ ubuntu@95.38.160.122:/opt/faratech-news-backend/wheels-linux/
 ```
 
@@ -73,29 +78,23 @@ curl https://api.faratech.news/health
 
 ```bash
 cd /Users/mac/Developer/faratech-news-backend
-
-rsync -avz --exclude '.venv' --exclude 'venv' --exclude '__pycache__' --exclude '.git' --exclude '.env' \
-  ./ ubuntu@95.38.160.122:/opt/faratech-news-backend/
+bash deploy/sync.sh
 ```
 
 If `requirements.txt` changed, also on Mac:
 
 ```bash
 bash deploy/download-wheels-linux.sh
+ssh ubuntu@95.38.160.122 'sudo chown -R ubuntu:ubuntu /opt/faratech-news-backend'
 rsync -avz wheels-linux/ ubuntu@95.38.160.122:/opt/faratech-news-backend/wheels-linux/
 ```
 
-### 2. Server — install + migrate + restart
+### 2. Server — install deps (only if requirements.txt changed)
 
 ```bash
 ssh ubuntu@95.38.160.122
 cd /opt/faratech-news-backend
-
-# deps changed:
 .venv/bin/pip install --no-index --find-links=./wheels-linux -r requirements.txt
-
-# always after code changes:
-.venv/bin/alembic upgrade head
 sudo chown -R www-data:www-data /opt/faratech-news-backend
 sudo systemctl restart faratech-api
 ```
@@ -118,6 +117,7 @@ curl http://127.0.0.1:8000/health
 
 | Problem | Command |
 |---------|---------|
+| rsync Permission denied | `/opt` is owned by `www-data` — run `bash deploy/sync.sh` or `ssh ubuntu@95.38.160.122 'sudo chown -R ubuntu:ubuntu /opt/faratech-news-backend'` before rsync |
 | API down | `sudo journalctl -u faratech-api -n 30 --no-pager` |
 | DB auth fail | `grep DATABASE_URL .env` — user must be `faratech` |
 | 502 from CDN | `sudo systemctl status nginx`; CDN origin `95.38.160.122:80` |

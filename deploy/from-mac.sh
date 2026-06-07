@@ -18,6 +18,9 @@ if [[ ! -d wheels-linux ]] || [[ -z "$(ls -A wheels-linux/*.whl 2>/dev/null)" ]]
     --only-binary=:all:
 fi
 
+echo "==> Granting ubuntu write access to ${APP_DIR}..."
+ssh "${SERVER}" "sudo mkdir -p ${APP_DIR} && sudo chown -R ubuntu:ubuntu ${APP_DIR}"
+
 echo "==> Uploading app to ${SERVER}:${APP_DIR}..."
 rsync -avz --progress \
   --exclude '.venv' \
@@ -35,4 +38,4 @@ else
 fi
 
 echo "==> Running finish-setup on server..."
-ssh "${SERVER}" "sudo mkdir -p ${APP_DIR} && sudo chown -R ubuntu:ubuntu ${APP_DIR} && bash ${APP_DIR}/deploy/finish-setup.sh"
+ssh "${SERVER}" "bash ${APP_DIR}/deploy/finish-setup.sh"
