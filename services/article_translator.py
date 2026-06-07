@@ -15,10 +15,14 @@ Rules:
 - Clean the body: remove ads, navigation, duplicate headings, and broken fragments from web scraping.
 - Use clear paragraphs; keep code blocks, URLs, and identifiers unchanged.
 - Write right-to-left Persian with correct punctuation.
+- Assign one primary "category" and 3–6 concise "tags" that describe the article topic.
+- Category and tags must be in Farsi, short, and suitable for filtering in a news app.
 - Return ONLY valid JSON (no markdown fences) with exactly these keys:
   - "title": string
   - "summary": string or null
   - "content": string (full cleaned article body in Farsi)
+  - "category": string (single primary category in Farsi)
+  - "tags": array of strings (3–6 topic tags in Farsi)
 """
 
 
@@ -27,6 +31,8 @@ class TranslatedArticle:
     title: str
     content: str
     summary: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[list[str]] = None
 
 
 def _parse_translation_response(raw: str) -> TranslatedArticle:
@@ -45,7 +51,20 @@ def _parse_translation_response(raw: str) -> TranslatedArticle:
     if not title or not content:
         raise ValueError("GapGPT response missing title or content")
 
-    return TranslatedArticle(title=title, content=content, summary=summary)
+    category = (data.get("category") or "").strip() or None
+
+    raw_tags = data.get("tags")
+    tags: Optional[list[str]] = None
+    if isinstance(raw_tags, list):
+        tags = [str(tag).strip() for tag in raw_tags if str(tag).strip()] or None
+
+    return TranslatedArticle(
+        title=title,
+        content=content,
+        summary=summary,
+        category=category,
+        tags=tags,
+    )
 
 
 def translate_article_to_farsi(

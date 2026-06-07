@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from crawler.metadata import resolve_category_and_tags
 from db.models.news import News, NewsStatus
 from models.news import NewsCreate, NewsPatch, NewsUpdate
 
@@ -24,7 +25,15 @@ def get_news_by_id(db: Session, news_id: UUID) -> Optional[News]:
 
 
 def create_news(db: Session, data: NewsCreate) -> News:
-    news = News(**data.model_dump())
+    category, tags = resolve_category_and_tags(
+        source=data.source or "",
+        category=data.category,
+        tags=data.tags,
+    )
+    payload = data.model_dump()
+    payload["category"] = category
+    payload["tags"] = tags
+    news = News(**payload)
     db.add(news)
     db.commit()
     db.refresh(news)

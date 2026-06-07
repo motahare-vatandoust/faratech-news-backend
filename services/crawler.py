@@ -4,6 +4,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from crawler.metadata import resolve_category_and_tags
 from crawler.registry import get_crawler
 from crawler.schemas import CrawlResult, CrawledArticle
 from db.models.news import News
@@ -13,10 +14,17 @@ from services.article_translator import translate_article_to_farsi
 
 
 def _article_to_news_create(article: CrawledArticle, source: str) -> NewsCreate:
+    category, tags = resolve_category_and_tags(
+        source=source,
+        category=article.category,
+        tags=article.tags,
+    )
     return NewsCreate(
         title=article.title,
         content=article.content,
         summary=article.summary,
+        category=category,
+        tags=tags,
         source=source,
         source_url=str(article.source_url),
         status=NewsStatus.draft,
@@ -35,6 +43,8 @@ async def _translate_crawled_article(article: CrawledArticle) -> CrawledArticle:
             "title": translated.title,
             "content": translated.content,
             "summary": translated.summary,
+            "category": translated.category or article.category,
+            "tags": translated.tags or article.tags,
         }
     )
 

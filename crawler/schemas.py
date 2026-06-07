@@ -11,6 +11,8 @@ class CrawledArticle(BaseModel):
     content: str
     source_url: HttpUrl
     summary: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[list[str]] = None
     author: Optional[str] = None
     published_at: Optional[datetime] = None
 

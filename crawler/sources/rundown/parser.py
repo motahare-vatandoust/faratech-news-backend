@@ -4,6 +4,7 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup, Tag
 
+from crawler.metadata import extract_category_from_meta, extract_tags_from_soup
 from crawler.schemas import CrawledArticle
 from crawler.sources.rundown import config
 
@@ -87,11 +88,15 @@ def parse_article_page(html: str, source_url: str) -> CrawledArticle:
     if author:
         # Example: "Zach Mink June 2, 2026" -> "Zach Mink"
         author = re.sub(r"\s+[A-Za-z]+\s+\d{1,2},\s+\d{4}$", "", author).strip()
+    category = extract_category_from_meta(soup)
+    tags = extract_tags_from_soup(soup)
 
     return CrawledArticle(
         title=title,
         content=content,
         summary=summary,
+        category=category,
+        tags=tags or None,
         source_url=source_url,
         author=author,
     )

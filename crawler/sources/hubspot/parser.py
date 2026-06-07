@@ -3,6 +3,7 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup, Tag
 
+from crawler.metadata import extract_category_from_meta, extract_tags_from_soup
 from crawler.schemas import CrawledArticle
 from crawler.sources.hubspot import config
 
@@ -60,6 +61,16 @@ def _first_text(soup: BeautifulSoup, selector: str) -> Optional[str]:
     return text or None
 
 
+def _category_from_source_url(source_url: str) -> Optional[str]:
+    path = urlparse(source_url).path.strip("/")
+    if not path:
+        return None
+    section = path.split("/")[0]
+    if section in config.ALLOWED_SECTIONS:
+        return section.title()
+    return None
+
+
 def parse_article_page(html: str, source_url: str) -> CrawledArticle:
     soup = BeautifulSoup(html, "html.parser")
 
@@ -79,11 +90,15 @@ def parse_article_page(html: str, source_url: str) -> CrawledArticle:
 
     summary = _meta_content(soup, property_name="og:description")
     author = _first_text(soup, '[rel="author"]') or _first_text(soup, ".author-name")
+    category = _category_from_source_url(source_url) or extract_category_from_meta(soup)
+    tags = extract_tags_from_soup(soup)
 
     return CrawledArticle(
         title=title,
         content=content,
         summary=summary,
+        category=category,
+        tags=tags or None,
         source_url=source_url,
         author=author,
     )

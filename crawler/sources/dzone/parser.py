@@ -3,6 +3,7 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup, Tag
 
+from crawler.metadata import extract_category_from_meta, extract_tags_from_soup
 from crawler.schemas import CrawledArticle
 from crawler.sources.dzone import config
 
@@ -74,11 +75,15 @@ def parse_article_page(html: str, source_url: str) -> CrawledArticle:
 
     summary = _meta_content(soup, property_name="og:description")
     author = _first_text(soup, "span.author-name a") or _first_text(soup, "span.author-name")
+    category = extract_category_from_meta(soup) or _first_text(soup, ".article-topic a")
+    tags = extract_tags_from_soup(soup)
 
     return CrawledArticle(
         title=title,
         content=content,
         summary=summary,
+        category=category,
+        tags=tags or None,
         source_url=source_url,
         author=author,
     )

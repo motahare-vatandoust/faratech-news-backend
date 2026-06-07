@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 
 from bs4 import BeautifulSoup, Tag
 
+from crawler.metadata import extract_category_from_meta, extract_tags_from_soup
 from crawler.schemas import CrawledArticle
 from crawler.sources.bensbites import config
 
@@ -111,11 +112,15 @@ def parse_article_page(
         or _first_text(soup, "a[rel='author']")
         or _first_text(soup, ".post-meta .author")
     )
+    category = extract_category_from_meta(soup)
+    tags = extract_tags_from_soup(soup)
 
     return CrawledArticle(
         title=title,
         content=content,
         summary=summary,
+        category=category,
+        tags=tags or None,
         source_url=source_url,
         author=author,
     )
