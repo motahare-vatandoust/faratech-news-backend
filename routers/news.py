@@ -6,18 +6,20 @@ from sqlalchemy.orm import Session
 
 from db.models.news import NewsStatus
 from db.session import get_db
-from models.news import NewsCreate, NewsPatch, NewsResponse, NewsUpdate
+from models.news import NewsCreate, NewsListItem, NewsPatch, NewsResponse, NewsUpdate
 from services import news as news_service
 
 router = APIRouter(prefix="/news", tags=["news"])
 
 
-@router.get("", response_model=List[NewsResponse])
+@router.get("", response_model=List[NewsListItem])
 def list_news(
     db: Session = Depends(get_db),
     status: Optional[NewsStatus] = Query(default=None),
-) -> List[NewsResponse]:
-    return news_service.get_all_news(db, status=status)
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> List[NewsListItem]:
+    return news_service.get_all_news(db, status=status, limit=limit, offset=offset)
 
 
 @router.get("/{news_id}", response_model=NewsResponse)

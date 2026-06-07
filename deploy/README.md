@@ -121,4 +121,5 @@ curl http://127.0.0.1:8000/health
 | API down | `sudo journalctl -u faratech-api -n 30 --no-pager` |
 | DB auth fail | `grep DATABASE_URL .env` — user must be `faratech` |
 | 502 from CDN | `sudo systemctl status nginx`; CDN origin `95.38.160.122:80` |
+| 504 on `/news` | Check `curl http://127.0.0.1:8000/health` — if `database` is `"error"`, fix `DATABASE_URL` in `.env`. Then reload nginx: `sudo cp deploy/nginx-api.conf /etc/nginx/sites-available/faratech-api && sudo nginx -t && sudo systemctl reload nginx` |
 | apt slow/broken | `sudo bash deploy/fix-apt-iran.sh` |

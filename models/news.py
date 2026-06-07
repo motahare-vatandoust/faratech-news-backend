@@ -41,6 +41,23 @@ class NewsPatch(BaseModel):
     status: Optional[NewsStatus] = None
 
 
+class NewsListItem(BaseModel):
+    """Lightweight list item — excludes full article body."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    title: str
+    summary: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[list[str]] = None
+    source: Optional[str] = None
+    source_url: Optional[str] = None
+    status: NewsStatus
+    created_at: datetime
+    updated_at: datetime
+
+
 class NewsResponse(NewsBase):
     model_config = ConfigDict(from_attributes=True)
 

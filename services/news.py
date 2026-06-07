@@ -2,7 +2,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, defer
 
 from crawler.metadata import resolve_category_and_tags
 from db.models.news import News, NewsStatus
@@ -13,8 +13,16 @@ def get_all_news(
     db: Session,
     *,
     status: Optional[NewsStatus] = None,
+    limit: int = 20,
+    offset: int = 0,
 ) -> List[News]:
-    stmt = select(News).order_by(News.created_at.desc())
+    stmt = (
+        select(News)
+        .options(defer(News.content))
+        .order_by(News.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
     if status is not None:
         stmt = stmt.where(News.status == status)
     return list(db.scalars(stmt).all())

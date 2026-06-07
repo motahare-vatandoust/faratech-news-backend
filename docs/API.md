@@ -82,9 +82,12 @@ Check that the API is running.
 
 ```json
 {
-  "status": "ok"
+  "status": "ok",
+  "database": "ok"
 }
 ```
+
+`database` is `"ok"` when PostgreSQL is reachable, `"error"` otherwise.
 
 ---
 
@@ -92,22 +95,23 @@ Check that the API is running.
 
 ### `GET /news`
 
-List all news articles, newest first.
+List news articles (newest first). Returns lightweight items **without** full `content` — use `GET /news/{news_id}` for the full article body.
 
 **Query parameters**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `status` | string | No | Filter by status: `draft`, `review`, or `published` |
+| `limit` | integer | No | Page size (default `20`, max `100`) |
+| `offset` | integer | No | Skip N rows (default `0`) |
 
-**Response `200`** — array of `NewsResponse`
+**Response `200`** — array of `NewsListItem`
 
 ```json
 [
   {
     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
     "title": "عنوان خبر",
-    "content": "متن کامل مقاله...",
     "summary": "خلاصه کوتاه",
     "category": "هوش مصنوعی",
     "tags": ["AI", "یادگیری ماشین"],

@@ -92,7 +92,7 @@ curl http://localhost:8000/health
 Expected response:
 
 ```json
-{"status":"ok"}
+{"status":"ok","database":"ok"}
 ```
 
 Interactive API docs:
