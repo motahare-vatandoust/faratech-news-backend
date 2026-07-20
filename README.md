@@ -17,7 +17,23 @@ FastAPI backend for [Faratech News](https://faratech.news). It stores and serves
 
 ## Quick start
 
-### 1. Clone and create a virtual environment
+**One command** (venv, deps, DB, migrations, server):
+
+```bash
+./dev.sh
+```
+
+Requires PostgreSQL running locally (`brew services start postgresql@14`).  
+API: http://localhost:8000 · Docs: http://localhost:8000/docs
+
+Optional env overrides: `PORT=8001 ./dev.sh`, `DB_NAME=faratech_news ./dev.sh`.
+
+### Manual setup
+
+<details>
+<summary>Step-by-step (if you prefer not to use ./dev.sh)</summary>
+
+#### 1. Clone and create a virtual environment
 
 ```bash
 git clone <repo-url>
@@ -27,13 +43,13 @@ python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 ```
 
-### 2. Install dependencies
+#### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configure environment
+#### 3. Configure environment
 
 Copy the example env file and edit it:
 
@@ -41,17 +57,17 @@ Copy the example env file and edit it:
 cp .env.example .env
 ```
 
-Minimum settings for local development:
+On macOS Homebrew Postgres, use your OS username (no password):
 
 ```env
-DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/faratech_news
+DATABASE_URL=postgresql+psycopg://YOUR_MAC_USER@localhost:5432/faratech_news
 GAPGPT_API_KEY=your-gapgpt-api-key-here
 JWT_SECRET_KEY=change-this-in-production
 ```
 
 `GAPGPT_API_KEY` is required for translation and the `/ai/chat` endpoint. Crawling works without it if you pass `--no-translate` on the CLI or set `translate_to_farsi=false` on API calls.
 
-### 4. Create the database
+#### 4. Create the database
 
 ```bash
 createdb faratech_news
@@ -63,13 +79,13 @@ Or with `psql`:
 CREATE DATABASE faratech_news;
 ```
 
-### 5. Run migrations
+#### 5. Run migrations
 
 ```bash
 alembic upgrade head
 ```
 
-### 6. Start the API server
+#### 6. Start the API server
 
 ```bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
@@ -80,6 +96,8 @@ Or:
 ```bash
 python main.py
 ```
+
+</details>
 
 The API is available at `http://localhost:8000`.
 
