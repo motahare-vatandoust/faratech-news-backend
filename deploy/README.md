@@ -49,7 +49,7 @@ bash deploy/install-offline.sh
 DATABASE_URL=postgresql+psycopg://faratech:PASSWORD@localhost:5432/faratech_news
 GAPGPT_API_KEY=...
 JWT_SECRET_KEY=...
-CORS_ORIGINS=https://faratech.news,https://www.faratech.news
+CORS_ORIGINS=https://faratech.news,https://www.faratech.news,https://admin.faratech.news
 ```
 
 ### Pars Pack CDN

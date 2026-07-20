@@ -1,20 +1,20 @@
-import os
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import CORS_ORIGINS
 from routers import admin_auth, crawler, gapgpt, health, news
 
-_DEFAULT_CORS = []
-if os.getenv("ENVIRONMENT", "development") != "production":
-    _DEFAULT_CORS = [
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-    ]
+# Local frontend ports — always allowed so `npm run dev` can hit the
+# production API. Production site origins come from CORS_ORIGINS.
+_LOCAL_CORS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+]
+_allow_origins = list(dict.fromkeys(_LOCAL_CORS + CORS_ORIGINS))
 
 app = FastAPI(
     title="Faratech News Backend",
@@ -24,7 +24,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_DEFAULT_CORS + CORS_ORIGINS,
+    allow_origins=_allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
