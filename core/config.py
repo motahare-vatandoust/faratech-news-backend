@@ -11,7 +11,7 @@ DATABASE_URL = os.getenv(
 
 GAPGPT_API_KEY = os.getenv("GAPGPT_API_KEY", "")
 GAPGPT_BASE_URL = os.getenv("GAPGPT_BASE_URL", "https://api.gapgpt.app/v1")
-GAPGPT_DEFAULT_MODEL = os.getenv("GAPGPT_DEFAULT_MODEL", "gpt-4o")
+GAPGPT_DEFAULT_MODEL = os.getenv("GAPGPT_DEFAULT_MODEL", "gapgpt-qwen-3.6")
 GAPGPT_TRANSLATION_MODEL = os.getenv("GAPGPT_TRANSLATION_MODEL", GAPGPT_DEFAULT_MODEL)
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "change-this-in-production")

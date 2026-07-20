@@ -196,7 +196,7 @@ curl http://localhost:8000/admin/me \
 | `DATABASE_URL` | Yes | local Postgres URL | PostgreSQL connection string |
 | `GAPGPT_API_KEY` | For AI/translation | — | GapGPT API key |
 | `GAPGPT_BASE_URL` | No | `https://api.gapgpt.app/v1` | GapGPT API base URL |
-| `GAPGPT_DEFAULT_MODEL` | No | `gpt-4o` | Default chat model |
+| `GAPGPT_DEFAULT_MODEL` | No | `gapgpt-qwen-3.6` | Default chat model |
 | `GAPGPT_TRANSLATION_MODEL` | No | same as default | Model used for article translation |
 | `JWT_SECRET_KEY` | Yes (prod) | dev placeholder | Secret for signing admin JWTs |
 | `JWT_ALGORITHM` | No | `HS256` | JWT algorithm |

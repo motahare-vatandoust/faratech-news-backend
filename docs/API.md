@@ -393,7 +393,7 @@ OpenAI-compatible chat completion via GapGPT.
       "content": "Summarize this article in Farsi."
     }
   ],
-  "model": "gpt-4o"
+  "model": "gapgpt-qwen-3.6"
 }
 ```
 
@@ -402,7 +402,7 @@ OpenAI-compatible chat completion via GapGPT.
 ```json
 {
   "content": "Assistant reply text...",
-  "model": "gpt-4o"
+  "model": "gapgpt-qwen-3.6"
 }
 ```
 
