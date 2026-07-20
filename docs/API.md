@@ -117,6 +117,7 @@ List news articles (newest first). Returns lightweight items **without** full `c
     "tags": ["AI", "یادگیری ماشین"],
     "source": "deepmind",
     "source_url": "https://deepmind.google/blog/example",
+    "cover_image_url": "https://deepmind.google/static/cover.jpg",
     "status": "published",
     "created_at": "2026-06-07T10:00:00+00:00",
     "updated_at": "2026-06-07T10:00:00+00:00"
@@ -159,6 +160,7 @@ If `category` or `tags` are omitted, defaults are applied based on `source` (fal
 | `tags` | string[] | No | source default | Topic tags |
 | `source` | string | No | `null` | Crawler/source name |
 | `source_url` | string | No | `null` | Original URL |
+| `cover_image_url` | string | No | `null` | Cover/hero image URL |
 | `status` | string | No | `draft` | `draft`, `review`, or `published` |
 
 **Example request**
@@ -172,6 +174,7 @@ If `category` or `tags` are omitted, defaults are applied based on `source` (fal
   "tags": ["Python", "Backend"],
   "source": "dzone",
   "source_url": "https://dzone.com/articles/example",
+  "cover_image_url": "https://dzone.com/storage/cover.jpg",
   "status": "draft"
 }
 ```
@@ -206,6 +209,7 @@ Partial update. Only include fields to change.
 | `tags` | string[] | No |
 | `source` | string | No |
 | `source_url` | string | No |
+| `cover_image_url` | string | No |
 | `status` | string | No |
 
 **Example request**
@@ -345,6 +349,7 @@ Returned by `/crawler/run` and all sync endpoints.
       "summary": "Optional summary",
       "category": "هوش مصنوعی",
       "tags": ["تحقیق", "یادگیری ماشین"],
+      "cover_image_url": "https://deepmind.google/static/cover.jpg",
       "author": "Google DeepMind",
       "published_at": null
     }
@@ -549,6 +554,7 @@ Change password for the authenticated admin.
 | `tags` | string[] \| null | Topic tags |
 | `source` | string \| null | Source identifier |
 | `source_url` | string \| null | Original article URL |
+| `cover_image_url` | string \| null | Cover/hero image URL (from crawl `og:image`) |
 | `status` | `NewsStatus` | Publication status |
 | `created_at` | datetime (ISO 8601) | Created timestamp |
 | `updated_at` | datetime (ISO 8601) | Last updated timestamp |

@@ -29,6 +29,7 @@ class News(Base):
     tags: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True)
     source: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
     source_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
+    cover_image_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
     status: Mapped[NewsStatus] = mapped_column(
         Enum(NewsStatus, name="news_status", values_callable=lambda x: [e.value for e in x]),
         nullable=False,

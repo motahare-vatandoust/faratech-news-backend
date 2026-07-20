@@ -27,6 +27,7 @@ def _article_to_news_create(article: CrawledArticle, source: str) -> NewsCreate:
         tags=tags,
         source=source,
         source_url=str(article.source_url),
+        cover_image_url=article.cover_image_url,
         status=NewsStatus.draft,
     )
 

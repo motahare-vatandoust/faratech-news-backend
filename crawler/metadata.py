@@ -1,4 +1,5 @@
 from typing import Optional, Union
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup, Tag
 
@@ -57,6 +58,42 @@ def extract_category_from_meta(soup: BeautifulSoup) -> Optional[str]:
             value = str(tag["content"]).strip()
             if value:
                 return value
+    return None
+
+
+def extract_cover_image_url(
+    soup: BeautifulSoup,
+    *,
+    base_url: Optional[str] = None,
+) -> Optional[str]:
+    """Extract a cover/hero image URL from Open Graph, Twitter, or link tags."""
+
+    candidates: list[str] = []
+
+    for prop in ("og:image", "og:image:url", "og:image:secure_url"):
+        tag = soup.find("meta", attrs={"property": prop})
+        if isinstance(tag, Tag) and tag.get("content"):
+            candidates.append(str(tag["content"]).strip())
+
+    for name in ("twitter:image", "twitter:image:src"):
+        tag = soup.find("meta", attrs={"name": name})
+        if isinstance(tag, Tag) and tag.get("content"):
+            candidates.append(str(tag["content"]).strip())
+        tag = soup.find("meta", attrs={"property": name})
+        if isinstance(tag, Tag) and tag.get("content"):
+            candidates.append(str(tag["content"]).strip())
+
+    link = soup.find("link", attrs={"rel": "image_src"})
+    if isinstance(link, Tag) and link.get("href"):
+        candidates.append(str(link["href"]).strip())
+
+    for raw in candidates:
+        if not raw:
+            continue
+        absolute = urljoin(base_url, raw) if base_url else raw
+        if absolute.startswith(("http://", "https://")):
+            return absolute
+
     return None
 
 

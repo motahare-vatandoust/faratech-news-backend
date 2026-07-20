@@ -20,6 +20,7 @@ class NewsBase(BaseModel):
     tags: Optional[list[str]] = None
     source: Optional[str] = None
     source_url: Optional[str] = None
+    cover_image_url: Optional[str] = None
 
 
 class NewsCreate(NewsBase):
@@ -38,6 +39,7 @@ class NewsPatch(BaseModel):
     tags: Optional[list[str]] = None
     source: Optional[str] = None
     source_url: Optional[str] = None
+    cover_image_url: Optional[str] = None
     status: Optional[NewsStatus] = None
 
 
@@ -53,6 +55,7 @@ class NewsListItem(BaseModel):
     tags: Optional[list[str]] = None
     source: Optional[str] = None
     source_url: Optional[str] = None
+    cover_image_url: Optional[str] = None
     status: NewsStatus
     created_at: datetime
     updated_at: datetime

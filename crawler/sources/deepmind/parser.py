@@ -3,7 +3,11 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup, Tag
 
-from crawler.metadata import extract_category_from_meta, extract_tags_from_soup
+from crawler.metadata import (
+    extract_category_from_meta,
+    extract_cover_image_url,
+    extract_tags_from_soup,
+)
 from crawler.schemas import CrawledArticle
 from crawler.sources.deepmind import config
 
@@ -106,6 +110,7 @@ def parse_article_page(html: str, source_url: str) -> CrawledArticle:
     author = _first_text(soup, ".article-meta__author-name")
     category = extract_category_from_meta(soup) or _first_text(soup, ".article-meta__category")
     tags = extract_tags_from_soup(soup)
+    cover_image_url = extract_cover_image_url(soup, base_url=source_url)
 
     return CrawledArticle(
         title=title,
@@ -113,6 +118,7 @@ def parse_article_page(html: str, source_url: str) -> CrawledArticle:
         summary=summary,
         category=category,
         tags=tags or None,
+        cover_image_url=cover_image_url,
         source_url=source_url,
         author=author,
     )

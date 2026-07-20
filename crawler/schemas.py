@@ -13,6 +13,7 @@ class CrawledArticle(BaseModel):
     summary: Optional[str] = None
     category: Optional[str] = None
     tags: Optional[list[str]] = None
+    cover_image_url: Optional[str] = None
     author: Optional[str] = None
     published_at: Optional[datetime] = None
 
