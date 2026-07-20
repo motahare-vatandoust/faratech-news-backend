@@ -9,6 +9,9 @@ SOURCE_DEFAULTS: dict[str, dict[str, Union[str, list[str]]]] = {
     "marketingweek": {"category": "Marketing", "tags": ["marketing"]},
     "rundown": {"category": "AI", "tags": ["artificial intelligence"]},
     "bensbites": {"category": "AI", "tags": ["artificial intelligence"]},
+    "huggingface": {"category": "AI", "tags": ["machine learning", "open source"]},
+    "techcrunch": {"category": "AI", "tags": ["artificial intelligence", "startups"]},
+    "anthropic": {"category": "AI", "tags": ["research", "artificial intelligence"]},
 }
 
 

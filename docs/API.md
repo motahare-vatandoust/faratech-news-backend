@@ -233,7 +233,7 @@ Delete an article.
 
 ## Crawler
 
-Sources: `bensbites`, `deepmind`, `dzone`, `hubspot`, `marketingweek`, `rundown`
+Sources: `anthropic`, `bensbites`, `deepmind`, `dzone`, `hubspot`, `huggingface`, `marketingweek`, `rundown`, `techcrunch`
 
 Sync endpoints crawl the source, optionally translate to Farsi via GapGPT, and save new articles (skipping duplicates by `source` + `source_url`).
 
@@ -287,7 +287,7 @@ Run a generic crawl for any registered source.
 
 ```json
 {
-  "detail": "Unknown crawler source 'foo'. Known sources: bensbites, deepmind, dzone, hubspot, marketingweek, rundown"
+  "detail": "Unknown crawler source 'foo'. Known sources: anthropic, bensbites, deepmind, dzone, hubspot, huggingface, marketingweek, rundown, techcrunch"
 }
 ```
 
@@ -305,6 +305,9 @@ Convenience endpoints that crawl, translate (by default), and persist.
 | `POST` | `/crawler/marketingweek/sync` |
 | `POST` | `/crawler/rundown/sync` |
 | `POST` | `/crawler/bensbites/sync` |
+| `POST` | `/crawler/huggingface/sync` |
+| `POST` | `/crawler/techcrunch/sync` |
+| `POST` | `/crawler/anthropic/sync` |
 
 **Query parameters**
 
@@ -562,4 +565,7 @@ When crawlers or `POST /news` omit category/tags, these defaults apply:
 | `marketingweek` | Marketing | marketing |
 | `rundown` | AI | artificial intelligence |
 | `bensbites` | AI | artificial intelligence |
+| `huggingface` | AI | machine learning, open source |
+| `techcrunch` | AI | artificial intelligence, startups |
+| `anthropic` | AI | research, artificial intelligence |
 | (other / none) | General | `[]` |

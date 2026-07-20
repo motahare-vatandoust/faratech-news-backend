@@ -194,3 +194,51 @@ async def sync_bensbites(
         persist=True,
         translate_to_farsi=translate_to_farsi,
     )
+
+
+async def sync_huggingface(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new Hugging Face blog posts, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "huggingface",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+
+async def sync_techcrunch(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new TechCrunch AI articles, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "techcrunch",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+
+async def sync_anthropic(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new Anthropic news posts, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "anthropic",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )

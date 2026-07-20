@@ -1,12 +1,15 @@
 from typing import Dict, Type
 
 from crawler.base import BaseCrawler
+from crawler.sources.anthropic.crawler import AnthropicCrawler
 from crawler.sources.bensbites.crawler import BensBitesCrawler
 from crawler.sources.deepmind.crawler import DeepMindCrawler
 from crawler.sources.dzone.crawler import DZoneCrawler
 from crawler.sources.hubspot.crawler import HubSpotCrawler
+from crawler.sources.huggingface.crawler import HuggingFaceCrawler
 from crawler.sources.marketingweek.crawler import MarketingWeekCrawler
 from crawler.sources.rundown.crawler import RundownCrawler
+from crawler.sources.techcrunch.crawler import TechCrunchCrawler
 
 _CRAWLERS: Dict[str, Type[BaseCrawler]] = {
     DZoneCrawler.source_name: DZoneCrawler,
@@ -15,6 +18,9 @@ _CRAWLERS: Dict[str, Type[BaseCrawler]] = {
     MarketingWeekCrawler.source_name: MarketingWeekCrawler,
     RundownCrawler.source_name: RundownCrawler,
     BensBitesCrawler.source_name: BensBitesCrawler,
+    HuggingFaceCrawler.source_name: HuggingFaceCrawler,
+    TechCrunchCrawler.source_name: TechCrunchCrawler,
+    AnthropicCrawler.source_name: AnthropicCrawler,
 }
 
 
