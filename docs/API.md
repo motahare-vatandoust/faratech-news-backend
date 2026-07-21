@@ -237,7 +237,7 @@ Delete an article.
 
 ## Crawler
 
-Sources: `anthropic`, `bensbites`, `deepmind`, `dzone`, `hubspot`, `huggingface`, `marketingweek`, `rundown`, `techcrunch`
+Sources: `anthropic`, `bensbites`, `creativebloq`, `deepmind`, `designmilk`, `dzone`, `hubspot`, `huggingface`, `itsnicethat`, `marketingweek`, `nngroup`, `rundown`, `smashingmagazine`, `techcrunch`
 
 Sync endpoints crawl the source, optionally translate to Farsi via GapGPT, and save new articles (skipping duplicates by `source` + `source_url`).
 
@@ -291,7 +291,7 @@ Run a generic crawl for any registered source.
 
 ```json
 {
-  "detail": "Unknown crawler source 'foo'. Known sources: anthropic, bensbites, deepmind, dzone, hubspot, huggingface, marketingweek, rundown, techcrunch"
+  "detail": "Unknown crawler source 'foo'. Known sources: anthropic, bensbites, creativebloq, deepmind, designmilk, dzone, hubspot, huggingface, itsnicethat, marketingweek, nngroup, rundown, smashingmagazine, techcrunch"
 }
 ```
 
@@ -312,6 +312,11 @@ Convenience endpoints that crawl, translate (by default), and persist.
 | `POST` | `/crawler/huggingface/sync` |
 | `POST` | `/crawler/techcrunch/sync` |
 | `POST` | `/crawler/anthropic/sync` |
+| `POST` | `/crawler/smashingmagazine/sync` |
+| `POST` | `/crawler/nngroup/sync` |
+| `POST` | `/crawler/designmilk/sync` |
+| `POST` | `/crawler/creativebloq/sync` |
+| `POST` | `/crawler/itsnicethat/sync` |
 
 **Query parameters**
 
@@ -574,4 +579,9 @@ When crawlers or `POST /news` omit category/tags, these defaults apply:
 | `huggingface` | AI | machine learning, open source |
 | `techcrunch` | AI | artificial intelligence, startups |
 | `anthropic` | AI | research, artificial intelligence |
+| `smashingmagazine` | Design | design, ux |
+| `nngroup` | Design | ux, research |
+| `designmilk` | Design | design, product design |
+| `creativebloq` | Design | design, creative |
+| `itsnicethat` | Design | design, creative |
 | (other / none) | General | `[]` |

@@ -46,7 +46,7 @@ The input may contain scraping noise. Remove all of it from the output:
 Do not mention that content was translated or cleaned.
 
 ## Category & tags
-- category: one primary topic in Farsi (e.g. هوش مصنوعی، استارتاپ، بازاریابی، برنامه‌نویسی، امنیت، سخت‌افزار، فناوری)
+- category: one primary topic in Farsi (e.g. هوش مصنوعی، استارتاپ، بازاریابی، برنامه‌نویسی، طراحی، امنیت، سخت‌افزار، فناوری)
 - tags: 3–6 short Farsi keywords for search/filtering; no hashtags, no duplicates
 
 ## Output

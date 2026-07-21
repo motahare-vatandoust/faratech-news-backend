@@ -142,7 +142,7 @@ Skip translation (English only):
 python -m crawler --source dzone --limit 5 --save --no-translate
 ```
 
-Available sources: `anthropic`, `bensbites`, `deepmind`, `dzone`, `hubspot`, `huggingface`, `marketingweek`, `rundown`, `techcrunch`
+Available sources: `anthropic`, `bensbites`, `creativebloq`, `deepmind`, `designmilk`, `dzone`, `hubspot`, `huggingface`, `itsnicethat`, `marketingweek`, `nngroup`, `rundown`, `smashingmagazine`, `techcrunch`
 
 ### Via API
 

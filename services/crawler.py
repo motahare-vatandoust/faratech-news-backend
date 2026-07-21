@@ -243,3 +243,83 @@ async def sync_anthropic(
         persist=True,
         translate_to_farsi=translate_to_farsi,
     )
+
+
+async def sync_smashingmagazine(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new Smashing Magazine articles, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "smashingmagazine",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+
+async def sync_nngroup(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new NN/g UX articles, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "nngroup",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+
+async def sync_designmilk(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new Design Milk articles, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "designmilk",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+
+async def sync_creativebloq(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new Creative Bloq articles, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "creativebloq",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+
+async def sync_itsnicethat(
+    db: Session,
+    *,
+    limit: Optional[int] = None,
+    translate_to_farsi: bool = True,
+) -> tuple[CrawlResult, int]:
+    """Fetch new It's Nice That articles, translate to Farsi, and persist."""
+    return await run_crawl(
+        db,
+        "itsnicethat",
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )

@@ -13,6 +13,11 @@ SOURCE_DEFAULTS: dict[str, dict[str, Union[str, list[str]]]] = {
     "huggingface": {"category": "AI", "tags": ["machine learning", "open source"]},
     "techcrunch": {"category": "AI", "tags": ["artificial intelligence", "startups"]},
     "anthropic": {"category": "AI", "tags": ["research", "artificial intelligence"]},
+    "smashingmagazine": {"category": "Design", "tags": ["design", "ux"]},
+    "nngroup": {"category": "Design", "tags": ["ux", "research"]},
+    "designmilk": {"category": "Design", "tags": ["design", "product design"]},
+    "creativebloq": {"category": "Design", "tags": ["design", "creative"]},
+    "itsnicethat": {"category": "Design", "tags": ["design", "creative"]},
 }
 
 
