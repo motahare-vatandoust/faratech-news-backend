@@ -1,7 +1,13 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import CORS_ORIGINS
+from core.scheduler import (
+    start_auto_crawler_scheduler,
+    shutdown_auto_crawler_scheduler,
+)
 from routers import admin_auth, crawler, gapgpt, health, news
 
 # Local frontend ports — always allowed so `npm run dev` can hit the
@@ -16,10 +22,20 @@ _LOCAL_CORS = [
 ]
 _allow_origins = list(dict.fromkeys(_LOCAL_CORS + CORS_ORIGINS))
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler = start_auto_crawler_scheduler()
+    try:
+        yield
+    finally:
+        shutdown_auto_crawler_scheduler(scheduler)
+
+
 app = FastAPI(
     title="Faratech News Backend",
     description="News API backend for Faratech",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(

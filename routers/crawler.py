@@ -4,8 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from crawler.registry import get_crawler, get_source_base_urls, list_sources
+from core.scheduler import get_auto_crawler_status
 from db.session import get_db
+from models.auto_crawler import AutoCrawlerStatusResponse, AutoCrawlRunResponse
 from models.crawler import CrawlRequest, CrawlResponse, CrawlerSourceInfo
+from services import auto_crawler as auto_crawler_service
 from services import crawler as crawler_service
 
 router = APIRouter(prefix="/crawler", tags=["crawler"])
@@ -269,3 +272,26 @@ async def sync_anthropic_news(
         errors=result.errors,
         articles=result.articles,
     )
+
+
+@router.post("/auto/run", response_model=AutoCrawlRunResponse)
+async def run_auto_crawl(
+    db: Session = Depends(get_db),
+    limit: Optional[int] = Query(default=None, ge=1, le=100),
+    translate_to_farsi: bool = Query(
+        default=True,
+        description="Translate and clean articles to Farsi via GapGPT before saving",
+    ),
+) -> AutoCrawlRunResponse:
+    """Run a crawl for all registered sources (used by the automatic scheduler too)."""
+    return await auto_crawler_service.run_auto_crawl(
+        db,
+        limit=limit,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+
+@router.get("/status", response_model=AutoCrawlerStatusResponse)
+def get_crawler_status() -> AutoCrawlerStatusResponse:
+    """Return auto crawler scheduler runtime status."""
+    return get_auto_crawler_status()

@@ -20,3 +20,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440
 
 _cors_raw = os.getenv("CORS_ORIGINS", "")
 CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()]
+
+# Automatic crawler scheduler (runs every N minutes, 24/7)
+CRAWLER_INTERVAL_MINUTES = int(os.getenv("CRAWLER_INTERVAL_MINUTES", "60"))
+AUTO_CRAWLER_ENABLED = os.getenv("AUTO_CRAWLER_ENABLED", "true").lower() in (
+    "1",
+    "true",
+    "yes",
+    "y",
+    "on",
+)
