@@ -28,7 +28,8 @@ echo "==> Running database migrations..."
 
 echo "==> Installing systemd service..."
 sudo cp deploy/faratech-api.service /etc/systemd/system/
-sudo sed -i 's/--workers 2/--workers 1/' /etc/systemd/system/faratech-api.service
+# Auto-crawl scheduler requires a single worker (in-process APScheduler).
+sudo sed -i -E 's/--workers [0-9]+/--workers 1/' /etc/systemd/system/faratech-api.service
 sudo chown -R www-data:www-data "${APP_DIR}"
 sudo systemctl daemon-reload
 sudo systemctl enable faratech-api

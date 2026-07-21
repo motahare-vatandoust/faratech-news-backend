@@ -33,7 +33,7 @@ sudo chown -R www-data:www-data "${APP_DIR}"
 
 echo "==> systemd..."
 sudo cp deploy/faratech-api.service /etc/systemd/system/
-sudo sed -i 's/--workers 2/--workers 1/' /etc/systemd/system/faratech-api.service
+sudo sed -i -E 's/--workers [0-9]+/--workers 1/' /etc/systemd/system/faratech-api.service
 sudo systemctl daemon-reload
 sudo systemctl enable faratech-api
 sudo systemctl restart faratech-api

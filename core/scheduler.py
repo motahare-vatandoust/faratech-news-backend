@@ -4,16 +4,16 @@ import threading
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Generator, Optional
+from urllib.parse import unquote, urlparse
 from zoneinfo import ZoneInfo
 
+import psycopg
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from sqlalchemy import text
-from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Session
 
-from core.config import AUTO_CRAWLER_ENABLED, CRAWLER_INTERVAL_MINUTES
-from db.session import engine
+from core.config import AUTO_CRAWLER_ENABLED, CRAWLER_INTERVAL_MINUTES, DATABASE_URL
 from db.session import get_db
 from models.auto_crawler import AutoCrawlerStatusResponse
 from services import auto_crawler as auto_crawler_service
@@ -35,13 +35,44 @@ _SCHEDULER_LEADER_LOCK_KEY = int.from_bytes(b"faratech_scheduler_leader_v1", "bi
 UTC = ZoneInfo("UTC")
 
 _scheduler: Optional[BackgroundScheduler] = None
-_leader_lock_connection: Optional[Connection] = None
+# Dedicated psycopg connection (not SQLAlchemy pool) so the leader lock
+# cannot get stuck on a pooled connection after worker restarts.
+_leader_lock_connection: Optional[psycopg.Connection] = None
 
 _status_lock = threading.Lock()
 _last_run: Optional[datetime] = None
 _last_duration: Optional[float] = None
 _last_success: Optional[bool] = None
 _failed_sources: list = []
+
+
+def _psycopg_conninfo(database_url: str) -> str:
+    """Convert SQLAlchemy URL to a psycopg3 conninfo string."""
+    raw = database_url
+    for prefix in (
+        "postgresql+psycopg://",
+        "postgresql+psycopg2://",
+        "postgres+psycopg://",
+    ):
+        if raw.startswith(prefix):
+            raw = "postgresql://" + raw[len(prefix) :]
+            break
+    parsed = urlparse(raw)
+    if parsed.scheme not in ("postgresql", "postgres"):
+        raise ValueError(f"Unsupported DATABASE_URL scheme: {parsed.scheme!r}")
+
+    parts: list[str] = []
+    if parsed.hostname:
+        parts.append(f"host={parsed.hostname}")
+    if parsed.port:
+        parts.append(f"port={parsed.port}")
+    if parsed.path and parsed.path != "/":
+        parts.append(f"dbname={unquote(parsed.path.lstrip('/'))}")
+    if parsed.username:
+        parts.append(f"user={unquote(parsed.username)}")
+    if parsed.password is not None:
+        parts.append(f"password={unquote(parsed.password)}")
+    return " ".join(parts)
 
 
 @contextmanager
@@ -71,24 +102,39 @@ def _release_advisory_lock(db: Session) -> None:
     )
 
 
-def _try_acquire_scheduler_leader_lock() -> Optional[Connection]:
-    conn = engine.connect()
-    lock_acquired = conn.execute(
-        text("SELECT pg_try_advisory_lock(:key)"),
-        {"key": _SCHEDULER_LEADER_LOCK_KEY},
-    ).scalar()
-    if lock_acquired:
+def _try_acquire_scheduler_leader_lock() -> Optional[psycopg.Connection]:
+    """
+    Hold a session-level advisory lock on a dedicated connection.
+
+    Must not use the SQLAlchemy pool: returning a lock-holding connection to
+    the pool can block every future worker from becoming scheduler leader.
+    """
+    conn = psycopg.connect(_psycopg_conninfo(DATABASE_URL), autocommit=True)
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT pg_try_advisory_lock(%s)",
+                (_SCHEDULER_LEADER_LOCK_KEY,),
+            )
+            locked = bool(cur.fetchone()[0])
+    except Exception:
+        conn.close()
+        raise
+
+    if locked:
         return conn
+
     conn.close()
     return None
 
 
-def _release_scheduler_leader_lock(connection: Connection) -> None:
+def _release_scheduler_leader_lock(connection: psycopg.Connection) -> None:
     try:
-        connection.execute(
-            text("SELECT pg_advisory_unlock(:key)"),
-            {"key": _SCHEDULER_LEADER_LOCK_KEY},
-        )
+        with connection.cursor() as cur:
+            cur.execute(
+                "SELECT pg_advisory_unlock(%s)",
+                (_SCHEDULER_LEADER_LOCK_KEY,),
+            )
     finally:
         connection.close()
 
@@ -207,6 +253,7 @@ def start_auto_crawler_scheduler() -> Optional[BackgroundScheduler]:
         return None
 
     interval_minutes = CRAWLER_INTERVAL_MINUTES
+    now = datetime.now(UTC)
 
     scheduler = BackgroundScheduler(timezone=UTC)
     scheduler.add_job(
@@ -218,6 +265,8 @@ def start_auto_crawler_scheduler() -> Optional[BackgroundScheduler]:
         coalesce=True,
         max_instances=1,
         misfire_grace_time=300,
+        # IntervalTrigger alone waits one full interval before the first run.
+        next_run_time=now,
     )
     scheduler.start()
 
@@ -225,7 +274,7 @@ def start_auto_crawler_scheduler() -> Optional[BackgroundScheduler]:
     logger.info(
         "Auto crawler scheduler started "
         "(AUTO_CRAWLER_ENABLED=%s, interval=%s minute(s), timezone=UTC, "
-        "coalesce=True, max_instances=1, misfire_grace_time=300)",
+        "first_run=immediate, coalesce=True, max_instances=1, misfire_grace_time=300)",
         AUTO_CRAWLER_ENABLED,
         interval_minutes,
     )
@@ -280,4 +329,3 @@ def get_auto_crawler_status() -> AutoCrawlerStatusResponse:
             last_success=_last_success,
             failed_sources=list(_failed_sources),
         )
-
