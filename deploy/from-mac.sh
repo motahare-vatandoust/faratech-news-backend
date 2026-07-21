@@ -2,7 +2,7 @@
 # Run from your Mac in the project root. Uploads code + wheels, runs finish-setup on VPS.
 set -euo pipefail
 
-SERVER="${DEPLOY_SERVER:-ubuntu@95.38.160.122}"
+SERVER="${DEPLOY_SERVER:-ubuntu@146.19.212.121}"
 APP_DIR="/opt/faratech-news-backend"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 

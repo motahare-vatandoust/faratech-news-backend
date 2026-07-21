@@ -1,6 +1,6 @@
 # Deploy & update (Arvan VPS + Pars Pack CDN)
 
-Server: `ubuntu@95.38.160.122`  
+Server: `ubuntu@146.19.212.121`  
 App path: `/opt/faratech-news-backend`  
 API: `https://api.faratech.news`
 
@@ -25,16 +25,16 @@ bash deploy/download-wheels-linux.sh
 bash deploy/sync.sh   # normal code updates (migrate + restart)
 
 # first-time upload (includes wheels):
-ssh ubuntu@95.38.160.122 'sudo chown -R ubuntu:ubuntu /opt/faratech-news-backend'
+ssh ubuntu@146.19.212.121 'sudo chown -R ubuntu:ubuntu /opt/faratech-news-backend'
 rsync -avz --exclude '.venv' --exclude 'venv' --exclude '__pycache__' --exclude '.git' --exclude '.env' \
-  ./ ubuntu@95.38.160.122:/opt/faratech-news-backend/
-rsync -avz wheels-linux/ ubuntu@95.38.160.122:/opt/faratech-news-backend/wheels-linux/
+  ./ ubuntu@146.19.212.121:/opt/faratech-news-backend/
+rsync -avz wheels-linux/ ubuntu@146.19.212.121:/opt/faratech-news-backend/wheels-linux/
 ```
 
 ### Server — Postgres, .env, install
 
 ```bash
-ssh ubuntu@95.38.160.122
+ssh ubuntu@146.19.212.121
 cd /opt/faratech-news-backend
 
 cp .env.example .env
@@ -55,8 +55,8 @@ CORS_ORIGINS=https://faratech.news,https://www.faratech.news,https://admin.farat
 ### Pars Pack CDN
 
 - Nameservers: `mountain.parspack.net`, `savanna.parspack.net`
-- A record: `api` → `95.38.160.122`
-- Origin: `95.38.160.122:80` (HTTP)
+- A record: `api` → `146.19.212.121`
+- Origin: `146.19.212.121:80` (HTTP)
 - SSL: enable in CDN panel
 
 ### Verify
@@ -85,14 +85,14 @@ If `requirements.txt` changed, also on Mac:
 
 ```bash
 bash deploy/download-wheels-linux.sh
-ssh ubuntu@95.38.160.122 'sudo chown -R ubuntu:ubuntu /opt/faratech-news-backend'
-rsync -avz wheels-linux/ ubuntu@95.38.160.122:/opt/faratech-news-backend/wheels-linux/
+ssh ubuntu@146.19.212.121 'sudo chown -R ubuntu:ubuntu /opt/faratech-news-backend'
+rsync -avz wheels-linux/ ubuntu@146.19.212.121:/opt/faratech-news-backend/wheels-linux/
 ```
 
 ### 2. Server — install deps (only if requirements.txt changed)
 
 ```bash
-ssh ubuntu@95.38.160.122
+ssh ubuntu@146.19.212.121
 cd /opt/faratech-news-backend
 .venv/bin/pip install --no-index --find-links=./wheels-linux -r requirements.txt
 sudo chown -R www-data:www-data /opt/faratech-news-backend
@@ -117,9 +117,9 @@ curl http://127.0.0.1:8000/health
 
 | Problem | Command |
 |---------|---------|
-| rsync Permission denied | `/opt` is owned by `www-data` — run `bash deploy/sync.sh` or `ssh ubuntu@95.38.160.122 'sudo chown -R ubuntu:ubuntu /opt/faratech-news-backend'` before rsync |
+| rsync Permission denied | `/opt` is owned by `www-data` — run `bash deploy/sync.sh` or `ssh ubuntu@146.19.212.121 'sudo chown -R ubuntu:ubuntu /opt/faratech-news-backend'` before rsync |
 | API down | `sudo journalctl -u faratech-api -n 30 --no-pager` |
 | DB auth fail | `grep DATABASE_URL .env` — user must be `faratech` |
-| 502 from CDN | `sudo systemctl status nginx`; CDN origin `95.38.160.122:80` |
+| 502 from CDN | `sudo systemctl status nginx`; CDN origin `146.19.212.121:80` |
 | 504 on `/news` | Check `curl http://127.0.0.1:8000/health` — if `database` is `"error"`, fix `DATABASE_URL` in `.env`. Then reload nginx: `sudo cp deploy/nginx-api.conf /etc/nginx/sites-available/faratech-api && sudo nginx -t && sudo systemctl reload nginx` |
 | apt slow/broken | `sudo bash deploy/fix-apt-iran.sh` |
