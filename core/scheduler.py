@@ -18,7 +18,8 @@ from db.session import get_db
 from models.auto_crawler import AutoCrawlerStatusResponse
 from services import auto_crawler as auto_crawler_service
 
-logger = logging.getLogger(__name__)
+# Use uvicorn's logger so messages appear in normal server output.
+logger = logging.getLogger("uvicorn.error")
 
 # In-process overlap protection (in addition to DB advisory lock).
 _running_lock = threading.Lock()
@@ -37,10 +38,10 @@ _scheduler: Optional[BackgroundScheduler] = None
 _leader_lock_connection: Optional[Connection] = None
 
 _status_lock = threading.Lock()
-_last_run: datetime | None = None
-_last_duration: float | None = None
-_last_success: bool | None = None
-_failed_sources: list[str] = []
+_last_run: Optional[datetime] = None
+_last_duration: Optional[float] = None
+_last_success: Optional[bool] = None
+_failed_sources: list = []
 
 
 @contextmanager
@@ -163,18 +164,45 @@ def _auto_crawl_job() -> None:
 def start_auto_crawler_scheduler() -> Optional[BackgroundScheduler]:
     global _scheduler, _leader_lock_connection
     if _scheduler is not None:
+        logger.info(
+            "Auto crawler scheduler already running (AUTO_CRAWLER_ENABLED=%s, interval=%s minute(s))",
+            AUTO_CRAWLER_ENABLED,
+            CRAWLER_INTERVAL_MINUTES,
+        )
         return _scheduler
+
+    logger.info(
+        "Initializing auto crawler scheduler (AUTO_CRAWLER_ENABLED=%s, interval=%s minute(s))",
+        AUTO_CRAWLER_ENABLED,
+        CRAWLER_INTERVAL_MINUTES,
+    )
 
     if not AUTO_CRAWLER_ENABLED:
         logger.info(
-            "Auto crawler scheduler disabled by configuration: AUTO_CRAWLER_ENABLED=false."
+            "Auto crawler scheduler disabled by configuration "
+            "(AUTO_CRAWLER_ENABLED=%s, interval=%s minute(s))",
+            AUTO_CRAWLER_ENABLED,
+            CRAWLER_INTERVAL_MINUTES,
         )
         return None
 
-    _leader_lock_connection = _try_acquire_scheduler_leader_lock()
+    try:
+        _leader_lock_connection = _try_acquire_scheduler_leader_lock()
+    except Exception:
+        logger.exception(
+            "Failed to acquire scheduler leader lock; scheduler will not start "
+            "(AUTO_CRAWLER_ENABLED=%s, interval=%s minute(s))",
+            AUTO_CRAWLER_ENABLED,
+            CRAWLER_INTERVAL_MINUTES,
+        )
+        return None
+
     if _leader_lock_connection is None:
         logger.info(
-            "Scheduler not started in this worker: another worker is the scheduler leader."
+            "Scheduler not started in this worker: another worker is the scheduler leader "
+            "(AUTO_CRAWLER_ENABLED=%s, interval=%s minute(s))",
+            AUTO_CRAWLER_ENABLED,
+            CRAWLER_INTERVAL_MINUTES,
         )
         return None
 
@@ -195,7 +223,10 @@ def start_auto_crawler_scheduler() -> Optional[BackgroundScheduler]:
 
     _scheduler = scheduler
     logger.info(
-        "Auto crawler scheduler started in leader worker: interval=%d minute(s), timezone=UTC, coalesce=True, max_instances=1, misfire_grace_time=300.",
+        "Auto crawler scheduler started "
+        "(AUTO_CRAWLER_ENABLED=%s, interval=%s minute(s), timezone=UTC, "
+        "coalesce=True, max_instances=1, misfire_grace_time=300)",
+        AUTO_CRAWLER_ENABLED,
         interval_minutes,
     )
     return scheduler

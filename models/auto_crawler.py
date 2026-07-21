@@ -1,7 +1,7 @@
 from datetime import datetime
+from typing import List, Optional
 
-from pydantic import BaseModel
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 
 class AutoCrawlRunResponse(BaseModel):
@@ -10,14 +10,13 @@ class AutoCrawlRunResponse(BaseModel):
     duration_seconds: float
     success_count: int
     failed_count: int
-    exceptions: list[str] = Field(default_factory=list)
+    exceptions: List[str] = Field(default_factory=list)
 
 
 class AutoCrawlerStatusResponse(BaseModel):
     scheduler_running: bool
-    next_run: datetime | None = None
-    last_run: datetime | None = None
-    last_duration: float | None = None
-    last_success: bool | None = None
-    failed_sources: list[str] = Field(default_factory=list)
-
+    next_run: Optional[datetime] = None
+    last_run: Optional[datetime] = None
+    last_duration: Optional[float] = None
+    last_success: Optional[bool] = None
+    failed_sources: List[str] = Field(default_factory=list)
