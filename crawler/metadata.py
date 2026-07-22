@@ -7,6 +7,8 @@ from core.categories import DEFAULT_CATEGORY, normalize_category
 
 SOURCE_DEFAULTS: dict[str, dict[str, Union[str, list[str]]]] = {
     "dzone": {"category": "programming", "tags": ["programming"]},
+    "freecodecamp": {"category": "programming", "tags": ["programming", "web development"]},
+    "thenewstack": {"category": "programming", "tags": ["cloud", "software engineering"]},
     "deepmind": {"category": "ai", "tags": ["research", "machine learning"]},
     "hubspot": {"category": "marketing", "tags": ["marketing"]},
     "marketingweek": {"category": "marketing", "tags": ["marketing"]},
@@ -14,12 +16,18 @@ SOURCE_DEFAULTS: dict[str, dict[str, Union[str, list[str]]]] = {
     "bensbites": {"category": "ai", "tags": ["artificial intelligence"]},
     "huggingface": {"category": "ai", "tags": ["machine learning", "open source"]},
     "techcrunch": {"category": "ai", "tags": ["artificial intelligence", "startups"]},
+    "techcrunchstartups": {"category": "startup", "tags": ["startups", "funding"]},
+    "venturebeat": {"category": "startup", "tags": ["startups", "business"]},
     "anthropic": {"category": "ai", "tags": ["research", "artificial intelligence"]},
     "smashingmagazine": {"category": "design", "tags": ["design", "ux"]},
     "nngroup": {"category": "design", "tags": ["ux", "research"]},
     "designmilk": {"category": "design", "tags": ["design", "product design"]},
     "creativebloq": {"category": "design", "tags": ["design", "creative"]},
     "itsnicethat": {"category": "design", "tags": ["design", "creative"]},
+    "thehackernews": {"category": "cybersecurity", "tags": ["security", "threats"]},
+    "krebsonsecurity": {"category": "cybersecurity", "tags": ["security", "investigations"]},
+    "arstechnica": {"category": "hardware", "tags": ["gadgets", "hardware"]},
+    "tomshardware": {"category": "hardware", "tags": ["pc", "hardware"]},
 }
 
 

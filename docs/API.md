@@ -256,9 +256,9 @@ Delete an article.
 
 ## Crawler
 
-Sources: `anthropic`, `bensbites`, `creativebloq`, `deepmind`, `designmilk`, `dzone`, `hubspot`, `huggingface`, `itsnicethat`, `marketingweek`, `nngroup`, `rundown`, `smashingmagazine`, `techcrunch`
+Sources: `anthropic`, `arstechnica`, `bensbites`, `creativebloq`, `deepmind`, `designmilk`, `dzone`, `freecodecamp`, `hubspot`, `huggingface`, `itsnicethat`, `krebsonsecurity`, `marketingweek`, `nngroup`, `rundown`, `smashingmagazine`, `techcrunch`, `techcrunchstartups`, `thehackernews`, `thenewstack`, `tomshardware`, `venturebeat`
 
-Sync endpoints crawl the source, optionally translate to Farsi via GapGPT, and save new articles (skipping duplicates by `source` + `source_url`).
+Sync endpoints crawl the source, optionally translate to Farsi via GapGPT, and save new articles (skipping duplicates by `source` + `source_url`). Any registered source can also be synced via `POST /crawler/{source}/sync`.
 
 ### `GET /crawler/sources`
 
@@ -585,22 +585,30 @@ Change password for the authenticated admin.
 
 ### Source default categories
 
-When crawlers or `POST /news` omit category/tags, these defaults apply:
+When crawlers or `POST /news` omit category/tags, these defaults apply (canonical slugs):
 
 | Source | Default category | Default tags |
 |--------|------------------|--------------|
-| `dzone` | Development | programming |
-| `deepmind` | AI | research, machine learning |
-| `hubspot` | Marketing | marketing |
-| `marketingweek` | Marketing | marketing |
-| `rundown` | AI | artificial intelligence |
-| `bensbites` | AI | artificial intelligence |
-| `huggingface` | AI | machine learning, open source |
-| `techcrunch` | AI | artificial intelligence, startups |
-| `anthropic` | AI | research, artificial intelligence |
-| `smashingmagazine` | Design | design, ux |
-| `nngroup` | Design | ux, research |
-| `designmilk` | Design | design, product design |
-| `creativebloq` | Design | design, creative |
-| `itsnicethat` | Design | design, creative |
-| (other / none) | General | `[]` |
+| `dzone` | programming | programming |
+| `freecodecamp` | programming | programming, web development |
+| `thenewstack` | programming | cloud, software engineering |
+| `deepmind` | ai | research, machine learning |
+| `hubspot` | marketing | marketing |
+| `marketingweek` | marketing | marketing |
+| `rundown` | ai | artificial intelligence |
+| `bensbites` | ai | artificial intelligence |
+| `huggingface` | ai | machine learning, open source |
+| `techcrunch` | ai | artificial intelligence, startups |
+| `techcrunchstartups` | startup | startups, funding |
+| `venturebeat` | startup | startups, business |
+| `anthropic` | ai | research, artificial intelligence |
+| `smashingmagazine` | design | design, ux |
+| `nngroup` | design | ux, research |
+| `designmilk` | design | design, product design |
+| `creativebloq` | design | design, creative |
+| `itsnicethat` | design | design, creative |
+| `thehackernews` | cybersecurity | security, threats |
+| `krebsonsecurity` | cybersecurity | security, investigations |
+| `arstechnica` | hardware | gadgets, hardware |
+| `tomshardware` | hardware | pc, hardware |
+| (other / none) | technology | `[]` |

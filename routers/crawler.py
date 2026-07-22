@@ -394,6 +394,43 @@ async def sync_itsnicethat_news(
     )
 
 
+@router.post("/{source}/sync", response_model=CrawlResponse)
+async def sync_registered_source(
+    source: str,
+    db: Session = Depends(get_db),
+    limit: Optional[int] = Query(default=None, ge=1, le=100),
+    translate_to_farsi: bool = Query(
+        default=True,
+        description="Translate and clean articles to Farsi via GapGPT before saving",
+    ),
+) -> CrawlResponse:
+    """Crawl any registered source, translate to Farsi, and save new articles."""
+    try:
+        get_crawler(source)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+    result, saved_count = await crawler_service.run_crawl(
+        db,
+        source,
+        limit=limit,
+        persist=True,
+        translate_to_farsi=translate_to_farsi,
+    )
+
+    return CrawlResponse(
+        source=result.source,
+        fetched_count=len(result.articles),
+        saved_count=saved_count,
+        skipped_count=len(result.skipped_urls),
+        errors=result.errors,
+        articles=result.articles,
+    )
+
+
 @router.post("/auto/run", response_model=AutoCrawlRunResponse)
 async def run_auto_crawl(
     db: Session = Depends(get_db),
