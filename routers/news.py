@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from core.categories import NEWS_CATEGORY_SLUGS, normalize_category
 from db.models.news import NewsStatus
 from db.session import get_db
 from models.news import NewsCreate, NewsListItem, NewsPatch, NewsResponse, NewsUpdate
@@ -16,10 +17,24 @@ router = APIRouter(prefix="/news", tags=["news"])
 def list_news(
     db: Session = Depends(get_db),
     status: Optional[NewsStatus] = Query(default=None),
+    category: Optional[str] = Query(
+        default=None,
+        description=(
+            "Filter by canonical category slug: "
+            + ", ".join(NEWS_CATEGORY_SLUGS)
+        ),
+    ),
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
 ) -> List[NewsListItem]:
-    return news_service.get_all_news(db, status=status, limit=limit, offset=offset)
+    resolved_category = normalize_category(category) if category else None
+    return news_service.get_all_news(
+        db,
+        status=status,
+        category=resolved_category,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.get("/{news_id}", response_model=NewsResponse)

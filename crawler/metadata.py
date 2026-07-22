@@ -3,21 +3,23 @@ from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup, Tag
 
+from core.categories import DEFAULT_CATEGORY, normalize_category
+
 SOURCE_DEFAULTS: dict[str, dict[str, Union[str, list[str]]]] = {
-    "dzone": {"category": "Development", "tags": ["programming"]},
-    "deepmind": {"category": "AI", "tags": ["research", "machine learning"]},
-    "hubspot": {"category": "Marketing", "tags": ["marketing"]},
-    "marketingweek": {"category": "Marketing", "tags": ["marketing"]},
-    "rundown": {"category": "AI", "tags": ["artificial intelligence"]},
-    "bensbites": {"category": "AI", "tags": ["artificial intelligence"]},
-    "huggingface": {"category": "AI", "tags": ["machine learning", "open source"]},
-    "techcrunch": {"category": "AI", "tags": ["artificial intelligence", "startups"]},
-    "anthropic": {"category": "AI", "tags": ["research", "artificial intelligence"]},
-    "smashingmagazine": {"category": "Design", "tags": ["design", "ux"]},
-    "nngroup": {"category": "Design", "tags": ["ux", "research"]},
-    "designmilk": {"category": "Design", "tags": ["design", "product design"]},
-    "creativebloq": {"category": "Design", "tags": ["design", "creative"]},
-    "itsnicethat": {"category": "Design", "tags": ["design", "creative"]},
+    "dzone": {"category": "programming", "tags": ["programming"]},
+    "deepmind": {"category": "ai", "tags": ["research", "machine learning"]},
+    "hubspot": {"category": "marketing", "tags": ["marketing"]},
+    "marketingweek": {"category": "marketing", "tags": ["marketing"]},
+    "rundown": {"category": "ai", "tags": ["artificial intelligence"]},
+    "bensbites": {"category": "ai", "tags": ["artificial intelligence"]},
+    "huggingface": {"category": "ai", "tags": ["machine learning", "open source"]},
+    "techcrunch": {"category": "ai", "tags": ["artificial intelligence", "startups"]},
+    "anthropic": {"category": "ai", "tags": ["research", "artificial intelligence"]},
+    "smashingmagazine": {"category": "design", "tags": ["design", "ux"]},
+    "nngroup": {"category": "design", "tags": ["ux", "research"]},
+    "designmilk": {"category": "design", "tags": ["design", "product design"]},
+    "creativebloq": {"category": "design", "tags": ["design", "creative"]},
+    "itsnicethat": {"category": "design", "tags": ["design", "creative"]},
 }
 
 
@@ -111,7 +113,8 @@ def resolve_category_and_tags(
     defaults = SOURCE_DEFAULTS.get(source, {})
     resolved_category = category or defaults.get("category")
     if not isinstance(resolved_category, str) or not resolved_category:
-        resolved_category = "General"
+        resolved_category = DEFAULT_CATEGORY
+    resolved_category = normalize_category(resolved_category)
 
     resolved_tags = list(tags) if tags else []
     if not resolved_tags:

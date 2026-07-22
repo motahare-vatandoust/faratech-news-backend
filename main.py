@@ -9,7 +9,7 @@ from core.scheduler import (
     start_auto_crawler_scheduler,
     shutdown_auto_crawler_scheduler,
 )
-from routers import admin_auth, crawler, gapgpt, health, news
+from routers import admin_auth, categories, crawler, gapgpt, health, news
 
 # Use uvicorn's logger so startup messages appear in server output.
 logger = logging.getLogger("uvicorn.error")
@@ -70,6 +70,7 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(news.router)
+app.include_router(categories.router)
 app.include_router(crawler.router)
 app.include_router(gapgpt.router)
 app.include_router(admin_auth.router)

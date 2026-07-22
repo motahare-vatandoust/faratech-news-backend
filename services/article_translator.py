@@ -46,7 +46,9 @@ The input may contain scraping noise. Remove all of it from the output:
 Do not mention that content was translated or cleaned.
 
 ## Category & tags
-- category: one primary topic in Farsi (e.g. هوش مصنوعی، استارتاپ، بازاریابی، برنامه‌نویسی، طراحی، امنیت، سخت‌افزار، فناوری)
+- category: exactly one of these English slugs:
+  ai | programming | marketing | design | startup | cybersecurity | hardware | technology
+- Pick the best primary topic. Use technology only when nothing else fits.
 - tags: 3–6 short Farsi keywords for search/filtering; no hashtags, no duplicates
 
 ## Output
@@ -55,7 +57,7 @@ Return ONLY valid JSON (no markdown fences, no commentary) with exactly these ke
   "title": string,
   "summary": string or null,
   "content": string,
-  "category": string,
+  "category": "ai" | "programming" | "marketing" | "design" | "startup" | "cybersecurity" | "hardware" | "technology",
   "tags": ["string", ...]
 }
 

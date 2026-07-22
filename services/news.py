@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session, defer
 
+from core.categories import category_filter_values, normalize_category
 from crawler.metadata import resolve_category_and_tags
 from db.models.news import News, NewsStatus
 from models.news import NewsCreate, NewsPatch, NewsUpdate
@@ -13,6 +14,7 @@ def get_all_news(
     db: Session,
     *,
     status: Optional[NewsStatus] = None,
+    category: Optional[str] = None,
     limit: int = 20,
     offset: int = 0,
 ) -> List[News]:
@@ -25,6 +27,8 @@ def get_all_news(
     )
     if status is not None:
         stmt = stmt.where(News.status == status)
+    if category is not None:
+        stmt = stmt.where(News.category.in_(category_filter_values(category)))
     return list(db.scalars(stmt).all())
 
 
@@ -54,6 +58,8 @@ def update_news(db: Session, news_id: UUID, data: NewsUpdate) -> Optional[News]:
         return None
 
     payload = data.model_dump(exclude_unset=True)
+    if "category" in payload and payload["category"] is not None:
+        payload["category"] = normalize_category(payload["category"])
     for field, value in payload.items():
         setattr(news, field, value)
 
@@ -67,7 +73,10 @@ def patch_news(db: Session, news_id: UUID, data: NewsPatch) -> Optional[News]:
     if news is None:
         return None
 
-    for field, value in data.model_dump(exclude_unset=True).items():
+    payload = data.model_dump(exclude_unset=True)
+    if "category" in payload and payload["category"] is not None:
+        payload["category"] = normalize_category(payload["category"])
+    for field, value in payload.items():
         setattr(news, field, value)
 
     db.commit()

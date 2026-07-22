@@ -25,6 +25,7 @@ Authorization: Bearer <access_token>
 |----------|---------------|
 | `GET /health` | No |
 | `/news/*` | No |
+| `GET /categories` | No |
 | `/crawler/*` | No |
 | `POST /ai/chat` | No |
 | `POST /admin/register`, `POST /admin/login` | No |
@@ -102,6 +103,7 @@ List news articles (newest first). Returns lightweight items **without** full `c
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `status` | string | No | Filter by status: `draft`, `review`, or `published` |
+| `category` | string | No | Filter by canonical slug: `ai`, `programming`, `marketing`, `design`, `startup`, `cybersecurity`, `hardware`, `technology` |
 | `limit` | integer | No | Page size (default `20`, max `100`) |
 | `offset` | integer | No | Skip N rows (default `0`) |
 
@@ -113,14 +115,31 @@ List news articles (newest first). Returns lightweight items **without** full `c
     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
     "title": "عنوان خبر",
     "summary": "خلاصه کوتاه",
-    "category": "هوش مصنوعی",
-    "tags": ["AI", "یادگیری ماشین"],
+    "category": "ai",
+    "tags": ["هوش مصنوعی", "یادگیری ماشین"],
     "source": "deepmind",
     "source_url": "https://deepmind.google/blog/example",
     "cover_image_url": "https://deepmind.google/static/cover.jpg",
     "status": "published",
     "created_at": "2026-06-07T10:00:00+00:00",
     "updated_at": "2026-06-07T10:00:00+00:00"
+  }
+]
+```
+
+---
+
+### `GET /categories`
+
+Canonical news category taxonomy (slugs + EN/FA labels).
+
+**Response `200`**
+
+```json
+[
+  {
+    "id": "ai",
+    "label": { "en": "AI", "fa": "هوش مصنوعی" }
   }
 ]
 ```
